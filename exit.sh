@@ -4,7 +4,7 @@
 options="Reboot\nShutdown\nExit"
 
 # Use dmenu to display options and capture the user's selection
-choice=$(echo -e "$options" | dmenu -p "Choose an option:")
+choice=$(echo -e "$options" | dmenu)
 
 # Perform the action based on the user's choice
 case "$choice" in
