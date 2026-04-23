@@ -15,7 +15,7 @@ case "$choice" in
         doas poweroff now
         ;;
     "Exit")
-	doas pkill dwm
+	doas pkill dwm && doas ly
         ;;
     *)
         echo "No valid option selected."
