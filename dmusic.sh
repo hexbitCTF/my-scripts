@@ -1,16 +1,32 @@
 #!/bin/bash
 
-# 1. Show only filenames in dmenu
-# -printf "%f\n" prints just the file name without the path
-FILE_NAME=$(find -L "$HOME/Music" -type f \( -iname "*.mp3" -o -iname "*.flac" -o -iname "*.wav" -o -iname "*.ogg" -o -iname "*.m4a" -o -iname "*.opus" -o -iname "*.aac" \) -printf "%f\n" | dmenu)
+# --- Config ---
+MUSIC_DIR="$HOME/Music"
+SOCKET="/tmp/mpvsocket"
 
-# Exit if nothing was selected
-[ -z "$FILE_NAME" ] && exit 0
+# 1. Select the file using dmenu
+FILE=$(find -L "$MUSIC_DIR" -type f \( -iname "*.mp3" -o -iname "*.flac" -o -iname "*.wav" -o -iname "*.ogg" -o -iname "*.m4a" -o -iname "*.opus" \) -printf "%f\n" | dmenu)
 
-# 2. Find the actual path of the selected filename
-# -name "$FILE_NAME" searches for the file
-# -print -quit ensures it stops searching after finding the first match
-TARGET=$(find -L "$HOME/Music" -type f -name "$FILE_NAME" -print -quit)
+# Exit if user hits Escape/nothing is selected
+[ -z "$FILE" ] && exit 0
 
-# Play with mpv
-mpv --no-video "$TARGET"
+# 2. Cleanup old instances
+rm -f "$SOCKET"
+killall mpv 2>/dev/null
+
+# 3. Find the full path of the selected file
+TARGET=$(find -L "$MUSIC_DIR" -type f -name "$FILE" -print -quit)
+
+# 4. Launch in the Scratchpad
+# -t "scratchpad": Sets the window title for the DWM rule to catch
+# bash -c "...; bash": Keeps the shell open for interaction after mpv starts
+st -t "scratchpad" -e mpv --no-video --input-ipc-server="$SOCKET" "$TARGET"
+
+# 5. Hide the scratchpad immediately
+# We sleep briefly to ensure the window has spawned before we hide it
+xdotool search --sync --name "scratchpad" windowunmap
+# 6. Verify success
+sleep 0.5
+if [ ! -S "$SOCKET" ]; then
+    notify-send "Music Error" "mpv failed to start the socket."
+fi
