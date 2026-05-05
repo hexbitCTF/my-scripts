@@ -1,0 +1,16 @@
+#!/bin/sh
+
+# 1. DATA GATHERING
+# format: 24-hour time (e.g., 13:07)
+time_text=$(date '+%H:%M')
+
+# 2. CLICK HANDLER
+case $BLOCK_BUTTON in
+    1) notify-send "󱑍 Time/Date" "Full: $(date '+%A, %B %d, %Y')" ;;
+    2) setsid -f st -e vim "$0" ;; # Middle Click to Edit
+esac
+
+# 3. OUTPUT
+# Signal 16 + 1 = 17 -> \x11
+# \x1a is our "Dead Zone" shield for the trailing spaces
+printf "󱑍 %s\x11\x1a  " "$time_text"

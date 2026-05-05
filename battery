@@ -1,0 +1,15 @@
+#!/bin/sh
+capacity=$(cat /sys/class/power_supply/BAT0/capacity)
+status=$(cat /sys/class/power_supply/AC/online)
+
+[ "$status" = "1" ] && state="Charging" || state="Discharging"
+
+case $BLOCK_BUTTON in
+    1) notify-send "󰁹 Battery" "Status: $state ($capacity%)\nL: Info  M: Edit" ;;
+    2) setsid -f st -e vim "$0" ;;
+esac
+
+[ "$status" = "1" ] && icon="󰂄" || icon="󰁹"
+# Simplified icon logic for brevity, keep your original if preferred
+
+printf "%s %s%%\x02\x1a  " "$icon" "$capacity"

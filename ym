@@ -1,0 +1,19 @@
+#!/bin/bash
+
+MUSIC_DIR="$HOME/Music"
+mkdir -p "$MUSIC_DIR"
+
+# --restrict-filenames: Strips quotes and replaces spaces with underscores
+# --windows-filenames: Extra layer of protection to remove illegal chars (like quotes)
+# -o "%(title)s.%(ext)s": Explicitly tells it to use ONLY title and target extension
+YTDL_OPTS="--paths $MUSIC_DIR -x --audio-format mp3 --audio-quality 0 --restrict-filenames --windows-filenames -o %(title)s.%(ext)s"
+
+while true; do
+    ytfzf -c yt -m -l --ytdl-opts="$YTDL_OPTS"
+    
+    status=$?
+    if [ $status -ne 0 ]; then
+        break
+    fi
+    clear
+done

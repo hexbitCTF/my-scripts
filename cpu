@@ -1,0 +1,10 @@
+#!/bin/sh
+cpu=$(top -bn1 | grep "Cpu(s)" | awk '{printf "%.1f%%", 100 - $8}')
+
+case $BLOCK_BUTTON in
+    1) notify-send "󰻠 CPU" "Load: $cpu\nL: Info  M: Edit  R: Btop" ;;
+    2) setsid -f st -e vim "$0" ;;
+    3) setsid -f st -e btop ;;
+esac
+
+printf "󰻠 %-5s\x0f\x1a  " "$cpu"

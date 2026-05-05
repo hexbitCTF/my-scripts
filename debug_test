@@ -1,0 +1,2 @@
+#!/bin/sh
+echo "TRIGGERED: $1 at $(date)" >> /tmp/dwmblocks_debug.log

@@ -1,0 +1,40 @@
+#!/bin/sh
+
+# 1. Handle Clicks (via statuscmd/BLOCK_BUTTON)
+# Button 1: Left Click (Pause/Play)
+# Button 4: Scroll Up (Next)
+# Button 5: Scroll Down (Prev)
+case $BLOCK_BUTTON in
+    1) echo 'cycle pause' | socat - /tmp/mpvsocket 2>/dev/null ;;
+    4) echo 'playlist-next' | socat - /tmp/mpvsocket 2>/dev/null ;;
+    5) echo 'playlist-prev' | socat - /tmp/mpvsocket 2>/dev/null ;;
+esac
+
+# 2. Display Title
+if pgrep -x "mpv" > /dev/null; then
+    title=$(echo 'print-text ${media-title}' | socat - /tmp/mpvsocket 2>/dev/null)
+    # Default to "Paused" or "Playing" status if title is empty
+    echo "󰎆 ${title:-Playing} 󰐊󰐊 󰙦" 
+else
+    echo "󰎆 No Music"
+fi
+#!/bin/sh
+
+# 1. Handle Clicks (via statuscmd/BLOCK_BUTTON)
+# Button 1: Left Click (Pause/Play)
+# Button 4: Scroll Up (Next)
+# Button 5: Scroll Down (Prev)
+case $BLOCK_BUTTON in
+    1) echo 'cycle pause' | socat - /tmp/mpvsocket 2>/dev/null ;;
+    4) echo 'playlist-next' | socat - /tmp/mpvsocket 2>/dev/null ;;
+    5) echo 'playlist-prev' | socat - /tmp/mpvsocket 2>/dev/null ;;
+esac
+
+# 2. Display Title
+if pgrep -x "mpv" > /dev/null; then
+    title=$(echo 'print-text ${media-title}' | socat - /tmp/mpvsocket 2>/dev/null)
+    # Default to "Paused" or "Playing" status if title is empty
+    echo "󰎆 ${title:-Playing} 󰐊󰐊 󰙦" 
+else
+    echo "󰎆 No Music"
+fi

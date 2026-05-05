@@ -1,0 +1,48 @@
+#!/bin/sh
+
+# 1. Setup
+BLOCK_DIR="/tmp/music_scroll"
+[ ! -d "$BLOCK_DIR" ] && mkdir -p "$BLOCK_DIR"
+POS_FILE="$BLOCK_DIR/pos"
+WIDTH=20  # Total characters to show on the bar
+
+# 2. Get Title
+TITLE=$(echo '{ "command": ["get_property", "media-title"] }' | socat -T 0.1 - /tmp/mpvsocket 2>/dev/null | sed -n 's/.*"data":"\([^"]*\)".*/\1/p')
+
+# 3. Click Logic
+case $BLOCK_BUTTON in
+    1) notify-send "󰎆 Now Playing" "${TITLE:-Nothing is playing}" ;;
+    2) setsid -f st -e vim "$0" ;;
+esac
+
+# 4. Logic
+if [ -n "$TITLE" ]; then
+    LEN=${#TITLE}
+
+    # Only scroll if the title is actually longer than our display width
+    if [ "$LEN" -gt "$WIDTH" ]; then
+        # Add a smaller, fixed separator (3 spaces)
+        # This reduces that huge "dead zone" you saw
+        GAP="   "
+        LONG_TITLE="$TITLE$GAP"
+        NEW_LEN=${#LONG_TITLE}
+
+        [ -f "$POS_FILE" ] && POS=$(cat "$POS_FILE") || POS=0
+        
+        # Display window
+        DISPLAY_TITLE=$(echo "$LONG_TITLE$LONG_TITLE" | cut -c "$((POS+1))-$((POS+WIDTH))")
+        
+        # Update position
+        NEXT_POS=$(( (POS + 1) % NEW_LEN ))
+        echo "$NEXT_POS" > "$POS_FILE"
+        
+        printf "󰎆 %s\x0c\x1a  " "$DISPLAY_TITLE"
+    else
+        # If it fits, just show it static with no extra spaces
+        echo "0" > "$POS_FILE"
+        printf "󰎆 %s\x0c\x1a  " "$TITLE"
+    fi
+else
+    echo "0" > "$POS_FILE"
+    printf "󰎆 Idle\x0c\x1a  "
+fi

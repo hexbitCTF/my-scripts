@@ -1,0 +1,23 @@
+#!/bin/sh
+
+# 1. Path to the AC online status
+# 1 = Plugged in, 0 = Unplugged
+AC_FILE="/sys/class/power_supply/AC/online"
+SIGNAL=1
+
+# 2. Initial state
+OLD_AC=$(cat "$AC_FILE")
+
+while true; do
+    # Read current state
+    NEW_AC=$(cat "$AC_FILE")
+
+    # If the power connection toggled
+    if [ "$NEW_AC" != "$OLD_AC" ]; then
+        pkill -RTMIN+$SIGNAL dwmblocks
+        OLD_AC="$NEW_AC"
+    fi
+
+    # Check every second
+    sleep 1
+done

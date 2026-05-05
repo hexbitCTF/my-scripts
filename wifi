@@ -1,0 +1,33 @@
+#!/bin/sh
+
+# 1. DATA GATHERING
+interface=$(ip route | awk '/default/ {print $5}')
+state=$(connmanctl state | grep "State =" | awk '{print $3}')
+
+# Connman SSID extraction
+# We use a more robust way to get the 'Name' from the active service
+active_service=$(connmanctl services | grep '^\*A' | awk '{print $NF}')
+ssid=$(connmanctl services "$active_service" | grep "Name =" | awk -F"= " '{print $2}')
+
+# Logic for Bar Display (On/Off)
+if [ "$state" = "online" ] || [ "$state" = "ready" ]; then
+    icon="󰤨"
+    status_text="On"
+else
+    icon="󰤭"
+    status_text="Off"
+fi
+
+# 2. CLICK HANDLER
+case $BLOCK_BUTTON in
+    1) 
+        # We build the message in a variable first to ensure clean formatting
+        msg="Interface: ${interface:-N/A}\nSSID: ${ssid:-Disconnected}\nL: Info  M: Edit  R: CMST"
+        notify-send "󰤨 Network" "$msg" 
+        ;;
+    2) setsid -f st -e vim "$0" ;;
+    3) setsid -f cmst ;; 
+esac
+
+# 3. OUTPUT
+printf "%s %s\x10\x1a  " "$icon" "$status_text"

@@ -1,0 +1,9 @@
+#!/bin/sh
+bright=$(light -G | cut -d. -f1)
+
+case $BLOCK_BUTTON in
+    1) notify-send "󰃠 Brightness" "Level: $bright%\nL: Info  M: Edit" ;;
+    2) setsid -f st -e vim "$0" ;;
+esac
+
+printf "󰃠 %s%%\x0e\x1a  " "$bright"

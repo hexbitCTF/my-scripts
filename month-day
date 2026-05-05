@@ -1,0 +1,16 @@
+#!/bin/sh
+
+# 1. DATA GATHERING
+# format: Day, Month Date (e.g., Thu, Apr 30)
+date_text=$(date +'%a, %b %d')
+
+# 2. CLICK HANDLER
+case $BLOCK_BUTTON in
+    1) notify-send "󰃭 Calendar" "$(cal)" ;; # Shows a mini calendar in notification
+    2) setsid -f st -e vim "$0" ;;
+esac
+
+# 3. OUTPUT
+# Signal 2 + 1 = 3 -> \x03
+# \x1a is the Dead Zone shield for the trailing spaces
+printf "󰃭 %s\x03\x1a  " "$date_text"

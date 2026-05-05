@@ -1,0 +1,4 @@
+#!/bin/sh
+# Get pause state
+PAUSE=$(echo 'print-text ${pause}' | socat - /tmp/mpvsocket 2>/dev/null)
+[ "$PAUSE" == "yes" ] && echo "󰐊" || echo "󰏤"

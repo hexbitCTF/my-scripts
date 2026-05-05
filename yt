@@ -1,0 +1,23 @@
+#!/bin/bash
+
+# 1. Setup path
+VIDEO_DIR="$HOME/Videos"
+mkdir -p "$VIDEO_DIR"
+
+# 2. Updated Video Logic
+# -f "best": This is the "safe" format selector that avoids the merge errors
+# --paths: Sets the directory to ~/Videos
+# --restrict-filenames & --windows-filenames: Still nuking those quotes
+# -o %(title)s.%(ext)s: Clean filename
+YTDL_OPTS="--paths $VIDEO_DIR -f best --restrict-filenames --windows-filenames -o %(title)s.%(ext)s"
+
+while true; do
+    # Use the YouTube scraper and loop back to list
+    ytfzf -c yt -l --ytdl-opts="$YTDL_OPTS"
+    
+    status=$?
+    if [ $status -ne 0 ]; then
+        break
+    fi
+    clear
+done

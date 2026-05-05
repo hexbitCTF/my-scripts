@@ -1,0 +1,27 @@
+#!/bin/sh
+
+# 1. DATA GATHERING
+mixer_output=$(amixer -M get Master)
+
+# Parse out the raw percentage integer cleanly
+vol=$(echo "$mixer_output" | grep -o "\[[0-9]*%\]" | head -n1 | tr -d '[]%')
+
+# 2. ICON & STATUS LOGIC
+if echo "$mixer_output" | grep -q "\[off\]"; then
+    icon="󰝟"
+    display_vol="Muted"
+else
+    icon="󰕾"
+    display_vol="${vol}%"
+fi
+
+# 3. CLICK HANDLER
+case $BLOCK_BUTTON in
+    1) notify-send "󰕾 Volume" "Level: ${vol}%\nL: Info  M: Edit  R: Mixer" ;;
+    2) setsid -f st -e vim "$0" ;;
+    3) setsid -f st -e alsamixer ;;
+esac
+
+# 4. OUTPUT WITH RAW BLOCK PADDING
+# Using printf's octal/hex interpretation or evaluation to send raw bytes \r\x1a
+printf "%s %s\r\x1a  " "$icon" "$display_vol"

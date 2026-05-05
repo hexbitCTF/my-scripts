@@ -1,0 +1,20 @@
+#!/bin/bash
+
+while true; do
+    read -p "Search YouTube: " query
+    
+    # Exit if the input is empty
+    [ -z "$query" ] && break
+
+    # Execute search
+    # If the user hits Esc, $choice will be empty, and 'continue' restarts the loop
+    choice=$(yt-dlp --print title --print id --no-warnings --flat-playlist "ytsearch5:$query" 2>/dev/null | paste - - | \
+        fzf --delimiter='\t' --with-nth=1 --height=40% --reverse --prompt="Select Video > " \
+        --bind="alt-d:execute(yt-dlp --restrict-filenames -f best -o '~/Videos/%(title)s.%(ext)s' https://youtu.be/{2} 2>/dev/null)+abort")
+
+    [ -z "$choice" ] && continue 
+
+    # Play the video
+    url=$(echo "$choice" | awk -F'\t' '{print "https://youtu.be/" $2}')
+    mpv "$url"
+done

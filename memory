@@ -1,0 +1,17 @@
+#!/bin/sh
+
+# 1. DATA GATHERING
+# We use free -m for the calculation to keep it precise
+mem_info=$(free -m | awk '/^Mem:/ {printf "%.1fg/%.1fg", $3/1024, $2/1024}')
+
+# 2. CLICK HANDLER
+case $BLOCK_BUTTON in
+    1) notify-send "󰍛 Memory" "Usage: $mem_info\nL: Info  M: Edit  R: Htop" ;;
+    2) setsid -f st -e vim "$0" ;; 
+    3) setsid -f st -e htop ;;
+esac
+
+# 3. OUTPUT
+# Signal 3 + 1 = 4 -> \x04
+# \x1a is our "Dead Zone" shield for the trailing spaces
+printf "󰍛 %s\x04\x1a  " "$mem_info"

@@ -1,0 +1,19 @@
+#!/bin/bash
+
+while true; do
+    read -p "Search Music: " query
+    
+    # Exit if the input is empty
+    [ -z "$query" ] && break
+
+    # Execute search
+    choice=$(yt-dlp --print title --print id --no-warnings --flat-playlist "ytsearch5:$query" 2>/dev/null | paste - - | \
+        fzf --delimiter='\t' --with-nth=1 --height=40% --reverse --prompt="Select Music > " \
+        --bind="alt-d:execute(yt-dlp --restrict-filenames -x --audio-format mp3 -o '~/Music/%(title)s.%(ext)s' https://youtu.be/{2} 2>/dev/null)+abort")
+
+    [ -z "$choice" ] && continue
+
+    # Play the music
+    url=$(echo "$choice" | awk -F'\t' '{print "https://youtu.be/" $2}')
+    mpv --no-video "$url"
+done
